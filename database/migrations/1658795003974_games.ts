@@ -12,7 +12,7 @@ export default class extends BaseSchema {
       table.text('description').notNullable()
       table.integer('range').notNullable().unsigned()
       table.decimal('price', 8, 2).defaultTo(0).unsigned().notNullable()
-      table.integer('min_and_max_value').unsigned().notNullable()
+      table.integer('min_and_max_number').unsigned().notNullable()
       table.string('color').notNullable()
 
       /**

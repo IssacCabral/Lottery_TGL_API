@@ -3,7 +3,13 @@ import { BaseModel, column, beforeCreate } from '@ioc:Adonis/Lucid/Orm'
 
 import {v4 as uuidv4} from 'uuid'
 
-export default class Game extends BaseModel {
+import {Filterable} from '@ioc:Adonis/Addons/LucidFilter'
+import {compose} from '@ioc:Adonis/Core/Helpers'
+import GameFilter from './Filters/GameFilter'
+
+export default class Game extends compose(BaseModel, Filterable) {
+  public static $filter = () => GameFilter
+
   @column({ isPrimary: true })
   public id: number
 
