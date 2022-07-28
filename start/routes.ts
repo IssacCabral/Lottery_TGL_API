@@ -16,4 +16,5 @@ Route.get('/test_db_connections', async ({response}: HttpContextContract) => {
 
 Route.group(() => {
   Route.resource('/games', 'GamesController').apiOnly()
-}).prefix('lottery/api')
+})
+  .prefix('lottery/api')

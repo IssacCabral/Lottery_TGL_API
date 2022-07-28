@@ -18,6 +18,6 @@ export default class GameFilter extends BaseModelFilter {
   }
 
   minAndMaxNumber(value: number){
-    this.$query.where('mind_and_max_number', 'LIKE', `%${value}%`)
+    this.$query.where('min_and_max_number', 'LIKE', `%${value}%`)
   }
 }

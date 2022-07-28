@@ -57,11 +57,13 @@
     "@adonisjs/lucid": "^18.1.0",
     "@adonisjs/repl": "^3.1.0",
     "adonis-lucid-filter": "^4.1.0",
+    "argon2": "^0.28.7",
     "luxon": "^3.0.1",
     "mysql": "^2.18.1",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yarn": "^1.22.19"
   }
 }
