@@ -30,7 +30,8 @@
       "@adonisjs/repl",
       "@japa/preset-adonis/build/adonis-typings",
       "@adonisjs/lucid",
-      "adonis-lucid-filter"
+      "adonis-lucid-filter",
+      "@adonisjs/auth"
     ]
   }
 }

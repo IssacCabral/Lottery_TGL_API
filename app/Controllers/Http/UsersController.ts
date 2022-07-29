@@ -8,25 +8,25 @@ import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 
 export default class UsersController {
-  public async index({request, response}: HttpContextContract) {
-    const {page, limit, noPaginate, ...inputs} = request.qs()
+  public async index({ request, response }: HttpContextContract) {
+    const { page, limit, noPaginate, ...inputs } = request.qs()
 
-    if(noPaginate){
-      return await User.query().filter(inputs)
+    if (noPaginate) {
+      return await User.query().filter(inputs).preload('roles')
     }
 
-    try{
+    try {
       const users = await User.query()
         .filter(inputs)
         .paginate(page || 1, limit || 10)
 
-      return response.ok({users})
-    } catch(error){
+      return response.ok({ users })
+    } catch (error) {
       return response.badRequest({ message: 'error in list users', originalError: error.message })
     }
   }
 
-  public async store({request, response}: HttpContextContract) {
+  public async store({ request, response }: HttpContextContract) {
     await request.validate(StoreValidator)
 
     const userBody = request.only(['name', 'cpf', 'email', 'password'])
@@ -35,7 +35,7 @@ export default class UsersController {
 
     const trx = await Database.transaction()
 
-    try{
+    try {
       user.fill(userBody)
 
       user.useTransaction(trx)
@@ -44,39 +44,45 @@ export default class UsersController {
 
       const playerRole = await Role.findByOrFail('name', 'player')
 
-      if(playerRole){
+      if (playerRole) {
         await user.related('roles').attach([playerRole.id])
       }
-    } catch(error){
+    } catch (error) {
       trx.rollback()
-      return response.badRequest({message: 'error in create user', originalError: error.message})
+      return response.badRequest({ message: 'error in create user', originalError: error.message })
     }
 
     trx.commit()
-    
+
     let createdUser
-    try{
+    try {
       createdUser = await User.query().where('id', user.id).preload('roles')
-    } catch(error){
-      return response.notFound({message: 'error in find the created user', originalError: error.message})
+    } catch (error) {
+      return response.notFound({ message: 'error in find the created user', originalError: error.message })
     }
 
-    response.ok({createdUser})
+    response.ok({ createdUser })
   }
 
-  public async show({response, params}: HttpContextContract) {
+  public async show({ auth, response, params }: HttpContextContract) {
     const userSecureId = params.id
 
-    try{
+    try {
+      const checkId = auth.user?.secureId == userSecureId
+
+      if (!checkId) {
+        return response.forbidden({message: 'You don/\t have permissions to show other user'})
+      }
+
       const searchUser = await User.query().where('secure_id', userSecureId).preload('roles')
 
-      return response.ok({searchUser})
-    } catch(error){
-      return response.notFound({message: 'user not found', originalError: error.message})
+      return response.ok({ searchUser })
+    } catch (error) {
+      return response.notFound({ message: 'user not found', originalError: error.message })
     }
   }
 
-  public async update({request, response, params}: HttpContextContract) {
+  public async update({ auth, request, response, params }: HttpContextContract) {
     await request.validate(UpdateValidator)
 
     const userBody = request.only(['name', 'cpf', 'email', 'password'])
@@ -86,48 +92,47 @@ export default class UsersController {
 
     const trx = await Database.transaction()
 
-    // const checkId = auth.user?.secure_id == secureId
+    try {
+      const checkId = auth.user?.secureId == secureId
 
-    /*
-    if(!checkId){
-      throw new Error('You don/\'t have permissions to alter other user')
-    }
-    */
-    try{
+      if (!checkId) {
+        return response.forbidden({message: 'You don/\t have permissions to update other user'})
+      }
+
       user = await User.findByOrFail('secure_id', secureId)
 
       user.useTransaction(trx)
 
       await user.merge(userBody).save()
 
-    } catch(error){
+    } catch (error) {
       trx.rollback()
-      return response.badRequest({message: 'error in update user', originalError: error.message})
+      return response.badRequest({ message: 'error in update user', originalError: error.message })
     }
 
     trx.commit()
 
     let updatedUser
-    try{
+    try {
       updatedUser = await User.query().where('id', user.id).preload('roles')
-    } catch(error){
-      return response.notFound({message: 'error in find the updated user', originalError: error.message})
+    } catch (error) {
+      return response.notFound({ message: 'error in find the updated user', originalError: error.message })
     }
 
-    response.ok({updatedUser})
+    response.ok({ updatedUser })
   }
 
-  public async destroy({response, params}: HttpContextContract) {
+  public async destroy({response, params }: HttpContextContract) {
     const userSecureId = params.id
 
-    try{
+    try {
       const deleteThisUser = await User.findByOrFail('secure_id', userSecureId)
 
       await deleteThisUser.delete()
 
-      return response.ok({message: 'user successfull deleted'})
-    } catch(error){
-      return response.notFound({message: 'user not found', originalError: error.message})
+      return response.ok({ message: 'user successfull deleted' })
+    } catch (error) {
+      return response.notFound({ message: 'user not found', originalError: error.message })
     }
   }
 
