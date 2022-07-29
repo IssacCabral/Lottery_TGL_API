@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, beforeSave, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeCreate, beforeSave, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 
 import Hash from '@ioc:Adonis/Core/Hash'
 import Role from './Role'
@@ -8,6 +8,8 @@ import {v4 as uuidv4} from 'uuid'
 import {Filterable} from '@ioc:Adonis/Addons/LucidFilter'
 import {compose} from '@ioc:Adonis/Core/Helpers'
 import UserFilter from './Filters/UserFilter'
+
+import Bet from './Bet'
 
 export default class User extends compose(BaseModel, Filterable) {
   public static $filter = () => UserFilter
@@ -34,6 +36,9 @@ export default class User extends compose(BaseModel, Filterable) {
     pivotTable: 'user_roles'
   })
   public roles: ManyToMany<typeof Role>
+
+  @hasMany(() => Bet)
+  public bets: HasMany<typeof Bet>
 
   @beforeCreate()
   public static assignUUID(user: User){

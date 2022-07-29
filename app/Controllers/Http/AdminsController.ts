@@ -8,7 +8,7 @@ import SetUserRolesValidator from 'App/Validators/User/SetUserRolesValidator'
 import Role from 'App/Models/Role'
 
 export default class AdminsController {
-  public async promoteUser({request, response}: HttpContextContract){
+  public async setUserRoles({request, response}: HttpContextContract){
     await request.validate(SetUserRolesValidator)
 
     const {userId, roles} = request.all()
