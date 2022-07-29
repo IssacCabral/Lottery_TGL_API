@@ -24,7 +24,7 @@ export default class StoreValidator extends MessagesCustom{
       rules.email(),
       rules.unique({table: 'users', column: 'email'})
     ]),
-
+    
     password: schema.string({}, [rules.maxLength(50)])
   })
 

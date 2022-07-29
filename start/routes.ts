@@ -11,7 +11,12 @@ Route.group(() => {
 // admin routes  
 Route.group(() => {
   Route.resource('/games', 'GamesController').apiOnly()
-  Route.resource('/users', 'UsersController').only(['index', 'destroy'])
+
+  Route.get('/users', 'AdminsController.findAllUsers')
+  Route.post('/users/set-user-roles', 'AdminsController.promoteUser')
+  Route.delete('/users/:id', 'AdminsController.destroyUser')
+
+  Route.post('/carts', 'AdminsController.setMinCartValue')
 })
   .prefix('lottery/api')
   .middleware(['auth', 'is:admin'])
@@ -19,7 +24,8 @@ Route.group(() => {
   
 // players routes
 Route.group(() => {
-  Route.resource('/users', 'UsersController').except(['store', 'index', 'destroy'])
+  Route.get('/users/:id', 'UsersController.show')
+  Route.put('/users/:id', 'UsersController.update')
 })
   .prefix('lottery/api')
   .middleware(['auth', 'is:player'])

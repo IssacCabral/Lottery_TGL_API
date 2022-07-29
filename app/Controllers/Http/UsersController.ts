@@ -8,24 +8,7 @@ import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 
 export default class UsersController {
-  public async index({ request, response }: HttpContextContract) {
-    const { page, limit, noPaginate, ...inputs } = request.qs()
-
-    if (noPaginate) {
-      return await User.query().filter(inputs).preload('roles')
-    }
-
-    try {
-      const users = await User.query()
-        .filter(inputs)
-        .paginate(page || 1, limit || 10)
-
-      return response.ok({ users })
-    } catch (error) {
-      return response.badRequest({ message: 'error in list users', originalError: error.message })
-    }
-  }
-
+  
   public async store({ request, response }: HttpContextContract) {
     await request.validate(StoreValidator)
 
@@ -120,20 +103,6 @@ export default class UsersController {
     }
 
     response.ok({ updatedUser })
-  }
-
-  public async destroy({response, params }: HttpContextContract) {
-    const userSecureId = params.id
-
-    try {
-      const deleteThisUser = await User.findByOrFail('secure_id', userSecureId)
-
-      await deleteThisUser.delete()
-
-      return response.ok({ message: 'user successfull deleted' })
-    } catch (error) {
-      return response.notFound({ message: 'user not found', originalError: error.message })
-    }
   }
 
 }

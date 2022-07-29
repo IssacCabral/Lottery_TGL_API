@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').unique().unsigned()
 
-      table.decimal('min_cart_value', 3, 0).unsigned().notNullable().unique()
+      table.decimal('min_cart_value').unsigned().notNullable().unique()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
