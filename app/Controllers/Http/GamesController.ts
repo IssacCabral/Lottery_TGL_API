@@ -50,7 +50,7 @@ export default class GamesController {
     const gameSecureId = params.id
 
     try{
-      const gameUpdated = await Game.findBy('secure_id', gameSecureId)
+      const gameUpdated = await Game.findByOrFail('secure_id', gameSecureId)
 
       await gameUpdated?.merge(game).save()
 

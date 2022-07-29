@@ -16,7 +16,7 @@ export default class StoreValidator extends MessagesCustom{
     ]),
     cpf: schema.string([
       rules.regex(/^\d{3}.\d{3}.\d{3}-\d{2}$/),
-      rules.unique({table: 'users', column: 'email'})
+      rules.unique({table: 'users', column: 'cpf'})
     ]),
     email: schema.string({trim: true}, [
       rules.maxLength(50),
