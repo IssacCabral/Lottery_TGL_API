@@ -27,6 +27,11 @@ export default class GamesController {
   public async store({request, response}: HttpContextContract) {
     const game = await request.validate(StoreValidator)
 
+    const {range, minAndMaxNumber} = request.all()
+    if(minAndMaxNumber >= range){
+      return response.badRequest({message: 'range must be greater than minAndMaxNumber'})
+    }
+
     try{
       return {game: await Game.create(game)}
     } catch(error){

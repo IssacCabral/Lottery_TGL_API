@@ -8,6 +8,10 @@ export default class StoreValidator extends MessagesCustom{
     super()
   }
 
+  public refs = schema.refs({
+    range: this.ctx.request.only(['range'])
+  })
+
   public schema = schema.create({
     type: schema.string({trim: true}, [
       rules.maxLength(22),
@@ -23,7 +27,9 @@ export default class StoreValidator extends MessagesCustom{
       rules.minLength(3)
     ]),
 
-    range: schema.number([rules.unsigned()]),
+    range: schema.number([
+      rules.unsigned()
+    ]),
     price: schema.number([rules.unsigned()]),
 
     // validar para ser menor que o range
@@ -33,8 +39,10 @@ export default class StoreValidator extends MessagesCustom{
 
     color: schema.string({trim: true}, [
       rules.regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
-    ])
+    ]),
+
+
   })
 
-
+  
 }
