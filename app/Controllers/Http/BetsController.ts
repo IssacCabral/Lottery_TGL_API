@@ -7,7 +7,10 @@ import StoreValidator from 'App/Validators/Bet/StoreValidator'
 import ValidateBetNUmbers from 'App/utils/ValidateBetNumbers'
 import User from 'App/Models/User'
 
+import { sendNewBetEmail } from 'App/services/sendEmail'
+
 export default class BetsController {
+
   public async index({ }: HttpContextContract) {
 
   }
@@ -16,7 +19,7 @@ export default class BetsController {
     const {bets} = await request.validate(StoreValidator)
 
     const cart = await Cart.query().firstOrFail()
-    const {errors, betsToCreate} = await ValidateBetNUmbers(bets, cart.minCartValue)
+    const {errors, betsToCreate, cartTotalValue} = await ValidateBetNUmbers(bets, cart.minCartValue)
 
     if (errors.length > 0) {
       return response.badRequest(errors)
@@ -41,6 +44,14 @@ export default class BetsController {
       }
       
     })
+
+    try{
+      const user = await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
+
+      await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue)
+    } catch(error){
+      return response.badRequest({message: 'error in send welcome email', originalError: error.message})
+    }
 
     try{
       return await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()

@@ -16,7 +16,8 @@ interface ErrorValidate{
 
 interface ProcessorResults{
     errors: ErrorValidate[],
-    betsToCreate: BetsToCreate[]
+    betsToCreate: BetsToCreate[],
+    cartTotalValue: number
 }
 
 export default async function ValidateBetNUmbers(bets: BetValidate[], minCartValue: number): Promise<ProcessorResults>{
@@ -50,5 +51,5 @@ export default async function ValidateBetNUmbers(bets: BetValidate[], minCartVal
         })
     }
 
-    return {errors, betsToCreate}
+    return {errors, betsToCreate, cartTotalValue}
 }

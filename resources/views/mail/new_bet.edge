@@ -1,0 +1,15 @@
+@container({})
+  @content({})
+    <h2>Welcome again, {{ user.name }}!</h2>
+    <p>Your bets have been registered!</p>
+    <p class="highlight">Total price of bets: {{cartTotalValue}}</p>
+  @end
+  @subcontent({})
+    <p>Click below to check your bets ;)</p>
+    <a href="{{link}}">
+      @!button({
+        text: 'Your new bets ->'
+      })
+    </a>
+  @end
+@end

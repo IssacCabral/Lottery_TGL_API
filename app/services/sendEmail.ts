@@ -10,3 +10,12 @@ export async function sendEmail(user: User, template: string): Promise<void>{
             .htmlView(template, {user})
     })
 }
+
+export async function sendNewBetEmail(user: User, template: string, cartTotalValue: number): Promise<void>{
+    await Mail.send((message) => {
+        message.from('lottery-tgl-api@email.com')
+            .to(user.email)
+            .subject('Welcome to Lottery TGL')
+            .htmlView(template, {user, cartTotalValue})
+    })
+}

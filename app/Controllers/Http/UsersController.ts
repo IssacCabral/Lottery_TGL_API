@@ -36,7 +36,7 @@ export default class UsersController {
       trx.rollback()
       return response.badRequest({ message: 'error in create user', originalError: error.message })
     }
-
+    
     try{
       await sendEmail(user, 'mail/welcome')
     } catch(error){
