@@ -5,6 +5,9 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
   Route.post('/login', 'AuthController.login')
   Route.post('/users', 'UsersController.store')
+
+  Route.post('/forgot-password', 'ForgotPasswordsController.store')
+  Route.put('/recovery-password', 'ForgotPasswordsController.update')
 }).prefix('lottery/api')
 
 

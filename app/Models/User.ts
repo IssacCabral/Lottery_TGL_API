@@ -20,6 +20,12 @@ export default class User extends compose(BaseModel, Filterable) {
   @column()
   public secureId: string
 
+  @column({serializeAs: null})
+  public rememberMeToken?: string | null
+
+  @column.dateTime({serializeAs: null})
+  public tokenCreatedAt?: DateTime | null
+
   @column()
   public name: string
 
@@ -31,6 +37,9 @@ export default class User extends compose(BaseModel, Filterable) {
 
   @column({serializeAs: null})
   public password: string
+
+  @column()
+  public lastBet: DateTime | null
 
   @manyToMany(() => Role, {
     pivotTable: 'user_roles'

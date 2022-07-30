@@ -2,7 +2,7 @@ import User from "App/Models/User";
 import Mail from "@ioc:Adonis/Addons/Mail";
 
 
-export async function sendEmail(user: User, template: string): Promise<void>{
+export async function sendNewUserEmail(user: User, template: string): Promise<void>{
     await Mail.send((message) => {
         message.from('lottery-tgl-api@email.com')
             .to(user.email)
@@ -15,7 +15,17 @@ export async function sendNewBetEmail(user: User, template: string, cartTotalVal
     await Mail.send((message) => {
         message.from('lottery-tgl-api@email.com')
             .to(user.email)
-            .subject('Welcome to Lottery TGL')
+            .subject('Nice for make new Bets')
             .htmlView(template, {user, cartTotalValue})
     })
 }
+
+export async function sendRememberTokenEmail(user: User, template: string): Promise<void>{
+    await Mail.send((message) => {
+        message.from('lottery-tgl-api@email.com')
+            .to(user.email)
+            .subject('Recover Your password')
+            .htmlView(template, {user})
+    })
+}
+
