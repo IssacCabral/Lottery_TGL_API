@@ -38,7 +38,7 @@ export default class UsersController {
     }
 
     try{
-      await sendEmail(user, 'email/welcome')
+      await sendEmail(user, 'mail/welcome')
     } catch(error){
       return response.badRequest({message: 'error in send welcome email', originalError: error.message})
     }

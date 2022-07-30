@@ -1,0 +1,14 @@
+@container({})
+  @content({})
+    <h2>Welcome to TGL bets, {{ user.name }}!</h2>
+    <p>Now you have the freedom to bet as many times as you like!</p>
+  @end
+  @subcontent({})
+    <p>Click below to login to your account and start betting ;)</p>
+    <a href="{{link}}">
+      @!button({
+        text: 'New Bet ->'
+      })
+    </a>
+  @end
+@end
