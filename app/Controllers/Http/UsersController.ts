@@ -7,6 +7,8 @@ import UpdateValidator from 'App/Validators/User/UpdateValidator'
 import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 
+import { sendEmail } from 'App/services/sendEmail'
+
 export default class UsersController {
   
   public async store({ request, response }: HttpContextContract) {
@@ -33,6 +35,12 @@ export default class UsersController {
     } catch (error) {
       trx.rollback()
       return response.badRequest({ message: 'error in create user', originalError: error.message })
+    }
+
+    try{
+      await sendEmail(user, 'email/welcome')
+    } catch(error){
+      return response.badRequest({message: 'error in send welcome email', originalError: error.message})
     }
 
     trx.commit()
