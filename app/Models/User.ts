@@ -38,7 +38,7 @@ export default class User extends compose(BaseModel, Filterable) {
   @column({serializeAs: null})
   public password: string
 
-  @column()
+  @column.dateTime({serializeAs: null})
   public lastBet: DateTime | null
 
   @manyToMany(() => Role, {

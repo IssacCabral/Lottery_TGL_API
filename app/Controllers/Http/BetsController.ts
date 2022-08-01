@@ -9,24 +9,40 @@ import User from 'App/Models/User'
 
 import { sendNewBetEmail } from 'App/services/sendEmail'
 
+import { DateTime } from 'luxon'
+
 export default class BetsController {
 
-  public async index({ }: HttpContextContract) {
+  public async index({ request, response, auth }: HttpContextContract) {
+    const { page, limit, noPaginate } = request.qs()
+
+    if (noPaginate) {
+      return await Bet.query().where('user_id', auth.user!.id)
+    }
+
+    try {
+      const userBets = await Bet.query()
+        .paginate(page || 1, limit || 10)
+
+      return response.ok({ userBets })
+    } catch (error) {
+      return response.badRequest({ message: 'error in list user bets', originalError: error.message })
+    }
 
   }
 
   public async store({ request, response, auth }: HttpContextContract) {
-    const {bets} = await request.validate(StoreValidator)
+    const { bets } = await request.validate(StoreValidator)
 
     const cart = await Cart.query().firstOrFail()
-    const {errors, betsToCreate, cartTotalValue} = await ValidateBetNUmbers(bets, cart.minCartValue)
+    const { errors, betsToCreate, cartTotalValue } = await ValidateBetNUmbers(bets, cart.minCartValue)
 
     if (errors.length > 0) {
       return response.badRequest(errors)
     }
 
     betsToCreate.map(async (bet) => {
-      try{
+      try {
         const betToCreate = new Bet()
 
         betToCreate.fill({
@@ -36,33 +52,61 @@ export default class BetsController {
         })
 
         await betToCreate.save()
-      } catch(error){
+      } catch (error) {
         return response.badRequest({
-          message: `error in create the bet ${bet}`, 
+          message: `error in create the bet ${bet}`,
           originalError: error.message
         })
       }
-      
+
     })
 
-    try{
+    try {
+      const user = await User.query().where('id', auth.user!.id).firstOrFail()
+      user!.lastBet = DateTime.now()
+      await user!.save()
+    } catch (error) {
+      return response.badRequest({ message: 'error in set lastBet date', originalError: error.message })
+    }
+
+
+    try {
       const user = await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
 
       await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue)
-    } catch(error){
-      return response.badRequest({message: 'error in send welcome email', originalError: error.message})
+    } catch (error) {
+      return response.badRequest({ message: 'error in send welcome email', originalError: error.message })
     }
 
-    try{
+    try {
       return await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
-    } catch(error){
-      return response.notFound({message: 'user not found', originalError: error.message})
+    } catch (error) {
+      return response.notFound({ message: 'user not found', originalError: error.message })
     }
 
   }
 
-  public async show({ }: HttpContextContract) {
+  public async show({response, auth, params }: HttpContextContract) {
+    const betId = params.id
+    const userId = auth.user!.id
 
+    let bet
+    try {
+      bet = await Bet.findByOrFail('id', betId)
+    } catch (error) {
+      return response.notFound({ message: 'bet not found', originalError: error.message })
+    }
+
+    if (bet.userId !== userId) {
+      return response.forbidden({ message: 'You don/\t have permissions to show other user bet' })
+    }
+
+    const userBet = await Bet.query()
+      .where('id', betId)
+      .andWhere('user_id', userId)
+      .preload('game')
+
+    return response.ok({userBet})
   }
 
 }
