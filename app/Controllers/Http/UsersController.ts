@@ -7,7 +7,19 @@ import UpdateValidator from 'App/Validators/User/UpdateValidator'
 import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 
+import Bet from 'App/Models/Bet'
+
 import { sendNewUserEmail } from 'App/services/sendEmail'
+
+import moment from 'moment'
+import { DateTime } from 'luxon'
+
+interface BetToJson{
+  id: number
+	user_id: number
+	game_id: number
+	numbers: string
+}
 
 export default class UsersController {
   
@@ -65,9 +77,38 @@ export default class UsersController {
         return response.forbidden({message: 'You don/\t have permissions to show other user'})
       }
 
-      const searchUser = await User.query().where('secure_id', userSecureId).preload('roles')
+      const searchUser = await User.query()
+        .where('secure_id', userSecureId)
+        .preload('roles')
+        .preload('bets')
+        .first()
+      
+      const lastMonthBets: any = []
 
-      return response.ok({ searchUser })
+      searchUser?.bets.forEach(bet => {
+        const betYear = bet.createdAt.year
+        const betMonth = bet.createdAt.month
+        const betDay = bet.createdAt.day
+
+        const {year, month, day} = DateTime.now()
+
+        //const expiredBet = moment(`${year}-${month}-${day}`, "YYYY-MM-DD").subtract(30, 'days').isAfter(`${betYear}-${betMonth}-${betDay}`)
+        const expiredBet = moment(new Date(year, month, day), "YYYY-MM-DD").subtract(30, 'days').isAfter(new Date(betYear, betMonth, betDay))
+        
+        if(!expiredBet){
+          const betJSON = bet.serialize()
+          lastMonthBets.push(betJSON)
+        }
+
+      })
+
+      const userJSON = searchUser!.serialize()
+
+      delete userJSON.bets
+      
+      userJSON.lastMonthBets = lastMonthBets
+
+      return response.ok({ userJSON })
     } catch (error) {
       return response.notFound({ message: 'user not found', originalError: error.message })
     }
