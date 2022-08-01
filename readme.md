@@ -1,5 +1,4 @@
 Requisitos Não Funcionais
-     adicionei uma linha
      RNF01. Construir toda aplicação utilizando Adonis V5
 
      RNF02. Construir banco de dados com base no JSON (Em Anexo) 

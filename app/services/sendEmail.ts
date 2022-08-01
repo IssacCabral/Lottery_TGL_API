@@ -29,3 +29,11 @@ export async function sendRememberTokenEmail(user: User, template: string): Prom
     })
 }
 
+export async function sendRememberToBetEmail(user: User, template: string): Promise<void>{
+    await Mail.send((message) => {
+        message.from('lottery-tgl-api@email.com')
+            .to(user.email)
+            .subject('We are missing you')
+            .htmlView(template, {user})
+    })
+}

@@ -1,0 +1,15 @@
+@container({})
+	@content({})
+		<h2>Make a bet now, {{ user.name }}!</h2>
+		<p class="highlight">We're missing you :(</p>
+		<p class="highlight">Take advantage of today's beautiful day to place new bets!</p>
+	@end
+	@subcontent({})
+		<p>Click below to place new bets! :D</p>
+		<a href="{{ link }}">
+			@!button({
+				text: 'New Bet ->'
+			})
+		</a>
+	@end
+@end

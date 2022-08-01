@@ -14,12 +14,6 @@ import { sendNewUserEmail } from 'App/services/sendEmail'
 import moment from 'moment'
 import { DateTime } from 'luxon'
 
-interface BetToJson{
-  id: number
-	user_id: number
-	game_id: number
-	numbers: string
-}
 
 export default class UsersController {
   
@@ -92,7 +86,6 @@ export default class UsersController {
 
         const {year, month, day} = DateTime.now()
 
-        //const expiredBet = moment(`${year}-${month}-${day}`, "YYYY-MM-DD").subtract(30, 'days').isAfter(`${betYear}-${betMonth}-${betDay}`)
         const expiredBet = moment(new Date(year, month, day), "YYYY-MM-DD").subtract(30, 'days').isAfter(new Date(betYear, betMonth, betDay))
         
         if(!expiredBet){
