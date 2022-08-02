@@ -15,8 +15,7 @@ import { sendRememberToBetEmail } from '../services/sendEmail'
 
 export default class RememberUserToBet extends BaseTask {
 	public static get schedule() {
-		// return '0 30 12 * * 7'
-		return '0 34 18 * * *'
+		return '0 0 9 * * *'
 	}
 	/**
 	 * Set enable use .lock file for block run retry task
