@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+
+  app:
+    build: .
+    container_name: tgl_api
+    restart: on-failure
+    command: bash -c "yarn && yarn runProcess"
+    ports:
+      - ${PORT}:${PORT}
+    env_file:
+      - .env
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - tgl-api-network
+    depends_on:
+      - db  
+
+  db:
+    container_name: mysql_db 
+    image: 'alpine-mysql'
+    restart: always
+    env_file:
+      - .env
+    environment: 
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+    ports: 
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
+    volumes:
+      - tgl-api-mysql-data:/var/lib/mysql/data
+    networks:
+      - tgl-api-network  
+
+
+volumes:
+  tgl-api-mysql-data: 
+    driver: local
+
+networks:
+  tgl-api-network:

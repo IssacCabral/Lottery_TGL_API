@@ -1,3 +1,5 @@
+yarn add concurrently - lib para rodar dois processos ao mesmo tempo (rodar o processo da scheduler e o do server)
+
 Requisitos Não Funcionais
      RNF01. Construir toda aplicação utilizando Adonis V5
 
