@@ -20,7 +20,7 @@ services:
 
   db:
     container_name: mysql_db 
-    image: 'alpine-mysql'
+    image: 'mysql'
     restart: always
     env_file:
       - .env
@@ -28,6 +28,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSSWORD: ${MYSQL_PASSWORD}
     ports: 
       - "${MYSQL_PORT}:${MYSQL_PORT}"
     volumes:
