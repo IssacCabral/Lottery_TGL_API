@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "build": "node ace build --production",
+    "migration:run": "node ace migration:run",
+    "seeds:run": "node ace db:seed",
     "runscheduler": "node ace scheduler:run",
     "runProcess": "concurrently \"yarn runscheduler\" \"yarn dev\"",
     "start": "node server.js",

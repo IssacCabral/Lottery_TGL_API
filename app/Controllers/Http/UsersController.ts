@@ -7,8 +7,6 @@ import UpdateValidator from 'App/Validators/User/UpdateValidator'
 import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 
-import Bet from 'App/Models/Bet'
-
 import { sendNewUserEmail } from 'App/services/sendEmail'
 
 import moment from 'moment'
@@ -49,11 +47,11 @@ export default class UsersController {
       return response.badRequest({message: 'error in send welcome email', originalError: error.message})
     }
 
-    trx.commit()
+    await trx.commit()
 
     let createdUser
     try {
-      createdUser = await User.query().where('id', user.id).preload('roles')
+      createdUser = await User.query().where('id', user.id).preload('roles').firstOrFail()
     } catch (error) {
       return response.notFound({ message: 'error in find the created user', originalError: error.message })
     }

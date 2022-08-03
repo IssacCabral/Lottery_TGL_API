@@ -1,45 +1,34 @@
-version: '3'
-
-services:
-
-  app:
-    build: .
-    container_name: tgl_api
-    restart: on-failure
-    command: bash -c "yarn && yarn runProcess"
-    ports:
-      - ${PORT}:${PORT}
-    env_file:
-      - .env
-    volumes:
-      - ./:/usr/src/app
-    networks:
-      - tgl-api-network
-    depends_on:
-      - db  
-
-  db:
-    container_name: mysql_db 
-    image: 'mysql'
-    restart: always
-    env_file:
-      - .env
-    environment: 
-      MYSQL_DATABASE: ${MYSQL_DB_NAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_ROOT_PASSSWORD: ${MYSQL_PASSWORD}
-    ports: 
-      - "${MYSQL_PORT}:${MYSQL_PORT}"
-    volumes:
-      - tgl-api-mysql-data:/var/lib/mysql/data
-    networks:
-      - tgl-api-network  
-
-
-volumes:
-  tgl-api-mysql-data: 
-    driver: local
+version: "3"
 
 networks:
-  tgl-api-network:
+  luby_projects:
+    external: true
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./Docker/api/Dockerfile
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/app
+    networks:
+      - luby_projects
+    depends_on:
+      - mysql
+  mysql:
+    build:
+      context: ./Docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: loterry_tgl_api
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - luby_projects
+
+volumes:
+  db-data:
