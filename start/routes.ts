@@ -21,12 +21,14 @@ Route.group(() => {
 
   Route.post('/forgot-password', 'ForgotPasswordsController.store')
   Route.put('/recovery-password', 'ForgotPasswordsController.update')
+
+  Route.get('/games', 'GamesController.index')
 }).prefix('lottery/api')
 
 
 // admin routes  
 Route.group(() => {
-  Route.resource('/games', 'GamesController').apiOnly()
+  Route.resource('/games', 'GamesController').except(['index'])
 
   Route.get('/users', 'AdminsController.findAllUsers')
   Route.post('/users/set-user-roles', 'AdminsController.setUserRoles')
@@ -37,7 +39,6 @@ Route.group(() => {
   .prefix('lottery/api')
   .middleware(['auth', 'is:admin'])
 
-  
 // players routes
 Route.group(() => {
   Route.get('/users/:id', 'UsersController.show')

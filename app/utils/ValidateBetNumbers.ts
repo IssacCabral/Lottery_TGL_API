@@ -47,7 +47,7 @@ export default async function ValidateBetNUmbers(bets: BetValidate[], minCartVal
     
     if(cartTotalValue < minCartValue){
         errors.push({
-            message: `your cart must have a minimum value of ${minCartValue}`
+            message: `your cart must have a minimum value of R$${minCartValue},00`
         })
     }
 

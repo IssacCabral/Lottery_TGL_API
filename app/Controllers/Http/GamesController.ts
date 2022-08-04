@@ -4,12 +4,16 @@ import StoreValidator from 'App/Validators/Game/StoreValidator'
 import UpdateValidator from 'App/Validators/Game/UpdateValidator'
 import Game from 'App/Models/Game'
 
+import Cart from 'App/Models/Cart'
+
 export default class GamesController {
   public async index({request, response}: HttpContextContract) {
     const {page, limit, noPaginate, ...inputs} = request.qs()
+    const cart = await Cart.first()
+    const minCartValue = cart?.minCartValue
 
     if(noPaginate){
-      return {types: await Game.query().filter(inputs)}
+      return {minCartValue, types: await Game.query().filter(inputs)}
     }
 
     try{
@@ -17,7 +21,7 @@ export default class GamesController {
         .filter(inputs)
         .paginate(page || 1, limit || 10)
 
-      return response.ok({types: games})
+      return response.ok({minCartValue, types: games})
     } catch(error){
       return response.badRequest({ message: 'error in list games', originalError: error.message })
     }
