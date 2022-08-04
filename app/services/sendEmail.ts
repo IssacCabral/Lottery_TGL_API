@@ -11,12 +11,12 @@ export async function sendNewUserEmail(user: User, template: string): Promise<vo
     })
 }
 
-export async function sendNewBetEmail(user: User, template: string, cartTotalValue: number): Promise<void>{
+export async function sendNewBetEmail(user: User, template: string,  cartTotalValue: number, gamesInformation: any[]): Promise<void>{
     await Mail.send((message) => {
         message.from('lottery-tgl-api@email.com')
             .to(user.email)
             .subject('Nice for make new Bets')
-            .htmlView(template, {user, cartTotalValue})
+            .htmlView(template, {user, cartTotalValue, gamesInformation})
     })
 }
 

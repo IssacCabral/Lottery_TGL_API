@@ -2,13 +2,24 @@
   @content({})
     <h2>Welcome again, {{ user.name }}!</h2>
     <p>Your bets have been registered!</p>
-    <p class="highlight">Total price of bets: R${{cartTotalValue}}</p>
   @end
+
+  @betDiv({})
+    @each(game in gamesInformation)
+      @betContainer({})
+        <div> <strong> {{game.type}} </strong> </div>
+        <div> {{game.numbers}} </div>
+      @end
+    @end
+  @end
+
+  <p class="highlight">Total price of bets: R$ {{cartTotalValue}}</p>
+
   @subcontent({})
-    <p>Click below to check your bets ;)</p>
+    <p>Click below to place new bets ;)</p>
     <a href="{{link}}">
       @!button({
-        text: 'Your new bets ->'
+        text: 'New bets ->'
       })
     </a>
   @end

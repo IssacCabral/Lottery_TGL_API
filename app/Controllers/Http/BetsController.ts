@@ -10,6 +10,11 @@ import User from 'App/Models/User'
 import { sendNewBetEmail } from 'App/services/sendEmail'
 
 import { DateTime } from 'luxon'
+import GetGamesInformation from 'App/utils/GetGamesInformation'
+
+interface FindedBets{
+
+}
 
 export default class BetsController {
 
@@ -36,30 +41,37 @@ export default class BetsController {
 
     const cart = await Cart.query().firstOrFail()
     const { errors, betsToCreate, cartTotalValue } = await ValidateBetNUmbers(bets, cart.minCartValue)
-
+    //let betsCreatedIds: number[] = []
+    let betsCreatedAt
     if (errors.length > 0) {
       return response.badRequest(errors)
     }
 
-    betsToCreate.map(async (bet) => {
-      try {
-        const betToCreate = new Bet()
+    const gamesInformation = await GetGamesInformation(betsToCreate)
 
-        betToCreate.fill({
-          userId: auth.user!.id,
-          gameId: bet.gameId,
-          numbers: bet.numbers
-        })
+    await Promise.all(
+      betsToCreate.map(async (bet) => {
+        try {
+          const betToCreate = new Bet()
 
-        await betToCreate.save()
-      } catch (error) {
-        return response.badRequest({
-          message: `error in create the bet ${bet}`,
-          originalError: error.message
-        })
-      }
+          betToCreate.fill({
+            userId: auth.user!.id,
+            gameId: bet.gameId,
+            numbers: bet.numbers
+          })
 
-    })
+          await betToCreate.save()
+          //betsCreatedIds.push(betToCreate.id)
+          betsCreatedAt = betToCreate.createdAt
+        } catch (error) {
+          return response.badRequest({
+            message: `error in create the bet ${bet}`,
+            originalError: error.message
+          })
+        }
+
+      })
+    )
 
     try {
       const user = await User.query().where('id', auth.user!.id).firstOrFail()
@@ -73,20 +85,38 @@ export default class BetsController {
     try {
       const user = await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
 
-      await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue)
+      await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue, gamesInformation)
     } catch (error) {
-      return response.badRequest({ message: 'error in send welcome email', originalError: error.message })
+      return response.status(500).send({ message: 'error in send welcome email', originalError: error.message })
     }
 
     try {
-      return await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
+      const {year, month, day, hour, minute, second} = betsCreatedAt
+
+      let userFinded = await User.query()
+        .where('id', auth.user!.id)
+        .preload('bets', (betQuery) => {
+          betQuery.where('created_at', `${year}-${month}-${day}-${hour}-${minute}-${second}`)
+        }).firstOrFail()
+      
+      
+      let userFindedJSON = userFinded.serialize()
+
+      delete userFindedJSON.bets
+      
+      userFindedJSON.lastBetsPrice = cartTotalValue
+      userFindedJSON.lastBets = userFinded.bets.map((bet) => {
+        return bet.serialize()
+      })
+
+      return response.ok({user: userFindedJSON})
     } catch (error) {
       return response.notFound({ message: 'user not found', originalError: error.message })
     }
 
   }
 
-  public async show({response, auth, params }: HttpContextContract) {
+  public async show({ response, auth, params }: HttpContextContract) {
     const betId = params.id
     const userId = auth.user!.id
 
@@ -106,7 +136,7 @@ export default class BetsController {
       .andWhere('user_id', userId)
       .preload('game')
 
-    return response.ok({userBet})
+    return response.ok({ userBet })
   }
 
 }
