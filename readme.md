@@ -1,5 +1,3 @@
-yarn add concurrently - lib para rodar dois processos ao mesmo tempo (rodar o processo da scheduler e o do server)
-
 Requisitos Não Funcionais
      RNF01. Construir toda aplicação utilizando Adonis V5
 
@@ -36,6 +34,26 @@ Após finalizar, notifique seu líder.
 
 Em caso de dúvidas técnicas ou qualquer outro impedimento, comunique seu líder!
 
-## Diagrama de base Modelo relacional
+## How to run the project?
+
+```bash
+- clone the project in some preferred folder
+- in the .env file put your mailtrap login credentials
+- docker-compose up -d --build
+```
+
+## Relational Model Base Diagram
 
 <img src="./app/utils/Lotery_TGL_API.png">
+
+## The Project
+
+- the api has two types of users, being possible to create more roles as the system can grow
+- common users (players) and admins have different permissions depending on which route they want to access
+- users can edit their data and place bets 
+- only admins can change the roles of other users
+- only admins can manage game routes
+- only admins can see all users
+- user story and password recovery routes do not require authentication 
+- A scheduler was created, where every 9:00 of each day, an email is sent inviting users who have not bet in the last seven days to bet.
+

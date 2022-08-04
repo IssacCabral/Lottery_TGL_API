@@ -15,8 +15,8 @@ import { sendRememberToBetEmail } from '../services/sendEmail'
 
 export default class RememberUserToBet extends BaseTask {
 	public static get schedule() {
-		//return '0 0 9 * * *'
-		return '0 * * * * *'
+		return '0 0 9 * * *'
+		//return '0 * * * * *'
 	}
 	/**
 	 * Set enable use .lock file for block run retry task
@@ -52,6 +52,14 @@ export default class RememberUserToBet extends BaseTask {
 						} catch (error) {
 							return Logger.error('Error in send email')
 						}
+					}
+
+				} else {
+					try {
+						await sendRememberToBetEmail(user, 'mail/remember-bet')
+						return Logger.info('Email sent')
+					} catch (error) {
+						return Logger.error('Error in send email')
 					}
 
 				}
