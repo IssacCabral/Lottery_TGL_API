@@ -12,10 +12,6 @@ import { sendNewBetEmail } from 'App/services/sendEmail'
 import { DateTime } from 'luxon'
 import GetGamesInformation from 'App/utils/GetGamesInformation'
 
-interface FindedBets{
-
-}
-
 export default class BetsController {
 
   public async index({ request, response, auth }: HttpContextContract) {

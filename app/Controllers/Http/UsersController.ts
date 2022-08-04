@@ -11,10 +11,11 @@ import { sendNewUserEmail } from 'App/services/sendEmail'
 
 import moment from 'moment'
 import { DateTime } from 'luxon'
+import Game from 'App/Models/Game'
 
 
 export default class UsersController {
-  
+
   public async store({ request, response }: HttpContextContract) {
     await request.validate(StoreValidator)
 
@@ -40,11 +41,11 @@ export default class UsersController {
       trx.rollback()
       return response.badRequest({ message: 'error in create user', originalError: error.message })
     }
-    
-    try{
+
+    try {
       await sendNewUserEmail(user, 'mail/welcome')
-    } catch(error){
-      return response.badRequest({message: 'error in send welcome email', originalError: error.message})
+    } catch (error) {
+      return response.badRequest({ message: 'error in send welcome email', originalError: error.message })
     }
 
     await trx.commit()
@@ -66,43 +67,52 @@ export default class UsersController {
       const checkId = auth.user?.secureId == userSecureId
 
       if (!checkId) {
-        return response.forbidden({message: 'You don/\t have permissions to show other user'})
+        return response.forbidden({ message: 'You don/\t have permissions to show other user' })
       }
 
       const searchUser = await User.query()
         .where('secure_id', userSecureId)
         .preload('roles')
         .preload('bets')
-        .first()
-      
+        .firstOrFail()
+
       const lastMonthBets: any = []
+      let lastMonthBetsPrice: number = 0
 
-      searchUser?.bets.forEach(bet => {
-        const betYear = bet.createdAt.year
-        const betMonth = bet.createdAt.month
-        const betDay = bet.createdAt.day
+      await Promise.all(
+        searchUser?.bets.map(async (bet) => {
+          const betYear = bet.createdAt.year
+          const betMonth = bet.createdAt.month
+          const betDay = bet.createdAt.day
 
-        const {year, month, day} = DateTime.now()
+          const { year, month, day } = DateTime.now()
 
-        const expiredBet = moment(new Date(year, month, day), "YYYY-MM-DD").subtract(30, 'days').isAfter(new Date(betYear, betMonth, betDay))
-        
-        if(!expiredBet){
-          const betJSON = bet.serialize()
-          lastMonthBets.push(betJSON)
-        }
+          const expiredBet = moment(new Date(year, month, day), "YYYY-MM-DD").subtract(30, 'days').isAfter(new Date(betYear, betMonth, betDay))
 
-      })
+          if (!expiredBet) {
+            // carregar o game para pegar o preço
+            const game = await Game.findBy('id', bet.gameId)
+            lastMonthBetsPrice += game!.price
+
+            const betJSON = bet.serialize()
+            lastMonthBets.push(betJSON)
+          }
+
+        })
+      )
 
       const userJSON = searchUser!.serialize()
 
       delete userJSON.bets
-      
+
+      userJSON.lastMonthBetsPrice = lastMonthBetsPrice
       userJSON.lastMonthBets = lastMonthBets
 
       return response.ok({ userJSON })
     } catch (error) {
       return response.notFound({ message: 'user not found', originalError: error.message })
     }
+
   }
 
   public async update({ auth, request, response, params }: HttpContextContract) {
@@ -119,7 +129,7 @@ export default class UsersController {
       const checkId = auth.user?.secureId == secureId
 
       if (!checkId) {
-        return response.forbidden({message: 'You don/\t have permissions to update other user'})
+        return response.forbidden({ message: 'You don/\t have permissions to update other user' })
       }
 
       user = await User.findByOrFail('secure_id', secureId)

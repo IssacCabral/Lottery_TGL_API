@@ -9,7 +9,7 @@ export default class GamesController {
     const {page, limit, noPaginate, ...inputs} = request.qs()
 
     if(noPaginate){
-      return await Game.query().filter(inputs)
+      return {types: await Game.query().filter(inputs)}
     }
 
     try{
@@ -17,7 +17,7 @@ export default class GamesController {
         .filter(inputs)
         .paginate(page || 1, limit || 10)
 
-      return response.ok({games})
+      return response.ok({types: games})
     } catch(error){
       return response.badRequest({ message: 'error in list games', originalError: error.message })
     }
