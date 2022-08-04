@@ -57,3 +57,13 @@ Em caso de dúvidas técnicas ou qualquer outro impedimento, comunique seu líde
 - user story and password recovery routes do not require authentication 
 - A scheduler was created, where every 9:00 of each day, an email is sent inviting users who have not bet in the last seven days to bet.
 
+## Email sending service
+
+- when the user is created
+<img src="./resources/views/readme-images/welcome.png">
+- when the user submits a request for password recovery
+<img src="./resources/views/readme-images/reset_password.png">
+- when the user places some bets
+<img src="./resources/views/readme-images/bets.png">
+- when the user is reminded to place new bets
+ <img src="./resources/views/readme-images/remember_to_bet.png">
