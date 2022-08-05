@@ -60,10 +60,10 @@ Em caso de dúvidas técnicas ou qualquer outro impedimento, comunique seu líde
 ## Email sending service
 
 - when the user is created
-<img src="./resources/views/readme-images/welcome.png">
+     <img src="./resources/views/readme-images/welcome.png">
 - when the user submits a request for password recovery
-<img src="./resources/views/readme-images/reset_password.png">
+     <img src="./resources/views/readme-images/reset_password.png">
 - when the user places some bets
-<img src="./resources/views/readme-images/bets.png">
+     <img src="./resources/views/readme-images/bets.png">
 - when the user is reminded to place new bets
- <img src="./resources/views/readme-images/remember_to_bet.png">
+     <img src="./resources/views/readme-images/remember_to_bet.png">
