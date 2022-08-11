@@ -22,7 +22,7 @@ services:
       context: ./Docker/db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: loterry_tgl_api
+      MYSQL_DATABASE: lottery_tgl_api
     ports:
       - "3306:3306"
     volumes:
