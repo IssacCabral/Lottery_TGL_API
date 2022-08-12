@@ -8,11 +8,11 @@ test.group('Games show', (group) => {
     return (() => Database.rollbackGlobalTransaction())
   })
 
-  test('return list with 3 starting games if no paginate', async ({assert, client}) => {
-    const response = await client.get('lottery/api/games').qs()
+  test('return empty list when there are no games', async ({client}) => {
+    const response = await client.get('/lottery/api/games')
 
-    console.log(response.body())
     response.assertStatus(200)
-    //response.assertBodyContains({meta: {total: 3}})
+    response.assertBodyContains({types: {meta: {total: 0},data: []}})
   })
+
 })
