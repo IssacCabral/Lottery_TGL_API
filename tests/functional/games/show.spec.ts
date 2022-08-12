@@ -8,11 +8,4 @@ test.group('Games show', (group) => {
     return (() => Database.rollbackGlobalTransaction())
   })
 
-  test('return empty list when there are no games', async ({client}) => {
-    const response = await client.get('/lottery/api/games')
-
-    response.assertStatus(200)
-    response.assertBodyContains({types: {meta: {total: 0},data: []}})
-  })
-
 })
