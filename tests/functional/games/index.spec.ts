@@ -21,15 +21,12 @@ test.group('Games index', (group) => {
         await GameFactory.query().createMany(10)
 
         const response = await client.get('/lottery/api/games')
+        const games = await Game.query().orderBy('id', 'desc').limit(4)
+
+        assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
 
         response.assertStatus(200)
         response.assertBodyContains({ types: { meta: { total: 10, per_page: 4, current_page: 1 } }})
-
-        //const games = await Game.query().orderBy('id', 'desc').limit(4)
-
-        // esperar que contenha o subconjunto de games que acabamos de criar dentro desse test
-        //assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
-
     })
 
     test('get a no paginated list of existing games', async ({client, assert}) => {
@@ -66,9 +63,9 @@ test.group('Games index', (group) => {
         //     minCartValue: cart.minCartValue
         // })
 
-        console.log(response.body())
-        console.log('-----------------')
-        console.log(cart.minCartValue)
+        // console.log(response.body())
+        // console.log('-----------------')
+        // console.log(cart.minCartValue)
 
     })
 

@@ -19,6 +19,7 @@ export default class GamesController {
     try{
       const games = await Game.query()
         .filter(inputs)
+        .orderBy('id', 'desc')
         .paginate(page || 1, per_page || 4)
 
       return response.ok({minCartValue, types: games})
