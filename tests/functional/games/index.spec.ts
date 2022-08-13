@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
-import { GameFactory } from 'Database/factories'
+import { GameFactory, CartFactory } from 'Database/factories'
+import Game from 'App/Models/Game'
 
 test.group('Games index', (group) => {
     group.each.setup(async () => {
@@ -16,15 +17,58 @@ test.group('Games index', (group) => {
         response.assertBodyContains({ types: { meta: { total: 0 }, data: [] } })
     })
 
-    test('get a paginated list of existing games', async ({ client }) => {
-        await GameFactory.query().createMany(40)
+    test('get a paginated list of existing games', async ({ client, assert }) => {
+        await GameFactory.query().createMany(10)
 
         const response = await client.get('/lottery/api/games')
-        response.assertBodyContains({ types: { meta: { total: 40, per_page: 10, current_page: 1 } } })
+
         response.assertStatus(200)
+        response.assertBodyContains({ types: { meta: { total: 10, per_page: 4, current_page: 1 } }})
+
+        //const games = await Game.query().orderBy('id', 'desc').limit(4)
+
+        // esperar que contenha o subconjunto de games que acabamos de criar dentro desse test
+        //assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
+
     })
 
-    test('', async () => {
+    test('get a no paginated list of existing games', async ({client, assert}) => {
+        await GameFactory.query().createMany(3)
+
+        const response = await client.get('/lottery/api/games').qs({noPaginate: true})
+
+        response.assertStatus(200)
+        assert.containsSubset(response.body(), {types: []})
+    })
+
+    test('define custom per page result set', async({client, assert}) => {
+        await GameFactory.query().createMany(20)
+
+        const response = await client.get('/lottery/api/games').qs({per_page: 20})
+
+        response.assertBodyContains({ types: { meta: { total: 20, per_page: 20, current_page: 1 }, data: [] } })
+
+
+
+    })
+
+    test('return minCartValue when get a paginated list of existing games', async ({client, assert}) => {
+        await GameFactory.query().createMany(3)
+        const cart = await CartFactory.query().create()
+        
+        const response = await client.get('/lottery/api/games')
+
+        response.assertStatus(200)
+        // response.assertBodyContains({ 
+        //     types: { 
+        //         meta: { total: 3, per_page: 4, current_page: 1 } 
+        //     },
+        //     minCartValue: cart.minCartValue
+        // })
+
+        console.log(response.body())
+        console.log('-----------------')
+        console.log(cart.minCartValue)
 
     })
 

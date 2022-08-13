@@ -17,6 +17,7 @@ services:
       - luby_projects
     depends_on:
       - mysql
+      - dbtest
   mysql:
     build:
       context: ./Docker/db
@@ -30,5 +31,19 @@ services:
     networks:
       - luby_projects
 
+  dbtest:
+    build:
+      context: ./Docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_test
+      MYSQL_DATABASE: lottery_tgl_test
+    ports:
+      - "3456:3306"
+    volumes:
+      - db-data-test:/var/lib/mysql
+    networks:
+      - luby_projects    
+
 volumes:
   db-data:
+  db-data-test:

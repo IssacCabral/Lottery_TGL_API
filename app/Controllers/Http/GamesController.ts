@@ -8,7 +8,7 @@ import Cart from 'App/Models/Cart'
 
 export default class GamesController {
   public async index({request, response}: HttpContextContract) {
-    const {page, limit, noPaginate, ...inputs} = request.qs()
+    const {page, per_page, noPaginate, ...inputs} = request.qs()
     const cart = await Cart.first()
     const minCartValue = cart?.minCartValue
 
@@ -19,7 +19,7 @@ export default class GamesController {
     try{
       const games = await Game.query()
         .filter(inputs)
-        .paginate(page || 1, limit || 10)
+        .paginate(page || 1, per_page || 4)
 
       return response.ok({minCartValue, types: games})
     } catch(error){
