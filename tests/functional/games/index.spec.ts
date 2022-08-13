@@ -57,17 +57,12 @@ test.group('Games index', (group) => {
         const response = await client.get('/lottery/api/games')
 
         response.assertStatus(200)
-        // response.assertBodyContains({ 
-        //     types: { 
-        //         meta: { total: 3, per_page: 4, current_page: 1 } 
-        //     },
-        //     minCartValue: cart.minCartValue
-        // })
-
-        // console.log(response.body())
-        // console.log('-----------------')
-        // console.log(cart.minCartValue)
-
+        response.assertBodyContains({ 
+            types: { 
+                meta: { total: 3, per_page: 4, current_page: 1 } 
+            },
+            minCartValue: cart.minCartValue
+        })
     })
 
 })
