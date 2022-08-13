@@ -42,11 +42,12 @@ test.group('Games index', (group) => {
         await GameFactory.query().createMany(20)
 
         const response = await client.get('/lottery/api/games').qs({per_page: 20})
+        const games = await Game.query().orderBy('id', 'desc').limit(20)
 
+        assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
+
+        response.assertStatus(200)
         response.assertBodyContains({ types: { meta: { total: 20, per_page: 20, current_page: 1 }, data: [] } })
-
-
-
     })
 
     test('return minCartValue when get a paginated list of existing games', async ({client, assert}) => {
