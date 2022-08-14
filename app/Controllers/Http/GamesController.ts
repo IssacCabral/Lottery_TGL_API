@@ -66,7 +66,7 @@ export default class GamesController {
 
       return response.ok({gameUpdated})
     } catch(error){
-      return response.status(400).send({message: 'error in update game', originalError: error.message})
+      return response.status(404).send({message: 'error in update game', originalError: error.message})
     }
 
   }
