@@ -26,22 +26,22 @@ test.group('Games index', (group) => {
         assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
 
         response.assertStatus(200)
-        response.assertBodyContains({ types: { meta: { total: 10, per_page: 4, current_page: 1 } }})
+        response.assertBodyContains({ types: { meta: { total: 10, per_page: 4, current_page: 1 } } })
     })
 
-    test('get a no paginated list of existing games', async ({client, assert}) => {
+    test('get a no paginated list of existing games', async ({ client, assert }) => {
         await GameFactory.query().createMany(3)
 
-        const response = await client.get('/lottery/api/games').qs({noPaginate: true})
+        const response = await client.get('/lottery/api/games').qs({ noPaginate: true })
 
         response.assertStatus(200)
-        assert.containsSubset(response.body(), {types: []})
+        assert.containsSubset(response.body(), { types: [] })
     })
 
-    test('define custom per page result set', async({client, assert}) => {
+    test('define custom per page result set', async ({ client, assert }) => {
         await GameFactory.query().createMany(20)
 
-        const response = await client.get('/lottery/api/games').qs({per_page: 20})
+        const response = await client.get('/lottery/api/games').qs({ per_page: 20 })
         const games = await Game.query().orderBy('id', 'desc').limit(20)
 
         assert.containsSubset(games.map((row) => row.toJSON()), response.body().types.data)
@@ -50,16 +50,16 @@ test.group('Games index', (group) => {
         response.assertBodyContains({ types: { meta: { total: 20, per_page: 20, current_page: 1 }, data: [] } })
     })
 
-    test('return minCartValue when get a paginated list of existing games', async ({client}) => {
+    test('return minCartValue when get a paginated list of existing games', async ({ client }) => {
         await GameFactory.query().createMany(3)
         const cart = await CartFactory.query().create()
-        
+
         const response = await client.get('/lottery/api/games')
 
         response.assertStatus(200)
-        response.assertBodyContains({ 
-            types: { 
-                meta: { total: 3, per_page: 4, current_page: 1 } 
+        response.assertBodyContains({
+            types: {
+                meta: { total: 3, per_page: 4, current_page: 1 }
             },
             minCartValue: cart.minCartValue
         })

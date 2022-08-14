@@ -112,6 +112,4 @@ test.group('Games store', (group) => {
     })
   })
 
-
-
 })
