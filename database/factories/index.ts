@@ -1,6 +1,8 @@
 import Factory from '@ioc:Adonis/Lucid/Factory'
+
 import Game from 'App/Models/Game'
 import Cart from 'App/Models/Cart'
+import User from 'App/Models/User'
 
 export const GameFactory = Factory.define(Game, ({faker}) => {
     return {
@@ -16,5 +18,14 @@ export const GameFactory = Factory.define(Game, ({faker}) => {
 export const CartFactory = Factory.define(Cart, ({faker}) => {
     return {
         minCartValue: faker.datatype.number(100)
+    }
+}).build()
+
+export const UserFactory = Factory.define(User, ({faker}) => {
+    return {
+        name: faker.name.firstName() + ' ' + faker.name.lastName(),
+        cpf: "000.000.000-00",
+        email: faker.internet.email(),
+        password: faker.internet.password()
     }
 }).build()

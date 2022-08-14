@@ -50,7 +50,7 @@ test.group('Games index', (group) => {
         response.assertBodyContains({ types: { meta: { total: 20, per_page: 20, current_page: 1 }, data: [] } })
     })
 
-    test('return minCartValue when get a paginated list of existing games', async ({client, assert}) => {
+    test('return minCartValue when get a paginated list of existing games', async ({client}) => {
         await GameFactory.query().createMany(3)
         const cart = await CartFactory.query().create()
         
