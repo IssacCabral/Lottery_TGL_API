@@ -79,9 +79,9 @@ export default class GamesController {
 
       await game.delete()
 
-      return response.ok({message: 'Category successfully deleted'})
+      return response.ok({message: 'Game successfully deleted'})
     } catch(error){
-      return response.status(400).send({message: 'game not found', originalError: error.message})
+      return response.status(404).send({message: 'game not found', originalError: error.message})
     }
   }
 }

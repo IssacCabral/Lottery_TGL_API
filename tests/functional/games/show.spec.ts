@@ -36,7 +36,7 @@ test.group('Games show', (group) => {
 
   })
 
-  test('return 404 when gameSecureId does not exists', async ({ client, assert }) => {
+  test('return 404 when gameSecureId does not exists', async ({ client }) => {
     const user = await UserFactory.query().create()
     const roleAdmin = await RoleAdminFactory.query().create()
 
