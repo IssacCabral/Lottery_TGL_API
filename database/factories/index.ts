@@ -3,6 +3,7 @@ import Factory from '@ioc:Adonis/Lucid/Factory'
 import Game from 'App/Models/Game'
 import Cart from 'App/Models/Cart'
 import User from 'App/Models/User'
+import Role from 'App/Models/Role'
 
 export const GameFactory = Factory.define(Game, ({faker}) => {
     return {
@@ -28,4 +29,14 @@ export const UserFactory = Factory.define(User, ({faker}) => {
         email: faker.internet.email(),
         password: faker.internet.password()
     }
-}).build()
+})
+    .relation('roles', () => RoleAdminFactory)
+    .build()
+ 
+export const RoleAdminFactory = Factory.define(Role, () => {
+    return {
+        name: 'admin',
+        description: 'Access all resources of the system'
+    }
+})
+    .build()

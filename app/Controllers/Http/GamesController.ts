@@ -38,7 +38,7 @@ export default class GamesController {
     }
 
     try{
-      return {game: await Game.create(game)}
+      return response.created({game: await Game.create(game)}) 
     } catch(error){
       return response.status(400).send({message: 'error in create game', originalError: error.message})
     }
