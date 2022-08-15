@@ -38,5 +38,11 @@ export const RoleAdminFactory = Factory.define(Role, () => {
         name: 'admin',
         description: 'Access all resources of the system'
     }
-})
-    .build()
+}).build()
+
+export const RolePlayerFactory = Factory.define(Role, () => {
+    return {
+        name: 'player',
+        description: 'Access to bets and CRUD yourself'
+    }
+}).build()

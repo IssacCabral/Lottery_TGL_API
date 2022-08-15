@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
-import { UserFactory } from 'Database/factories'
+import { UserFactory, RolePlayerFactory } from 'Database/factories'
 
 test.group('Users store', (group) => {
   group.each.setup(async () => {
@@ -112,7 +112,7 @@ test.group('Users store', (group) => {
     })
   })
 
-  test('make sure cpf field is in a valid format', async ({client}) => {
+  test('make sure cpf field is in a valid format', async ({ client }) => {
     const response = await client.post('/lottery/api/users').form({
       name: 'Issac Cabral',
       cpf: '065.553-33178',
@@ -132,7 +132,7 @@ test.group('Users store', (group) => {
     })
   })
 
-  test('make sure email field is in a valid format', async ({client}) => {
+  test('make sure email field is in a valid format', async ({ client }) => {
     const response = await client.post('/lottery/api/users').form({
       name: 'Issac Cabral',
       cpf: '000.000.000-00',
@@ -150,6 +150,27 @@ test.group('Users store', (group) => {
         }
       ]
     })
+  })
+
+  test('ensure the user can be created when everything is fine', async ({ client, assert }) => {
+    await RolePlayerFactory.query().create()
+
+    const response = await client.post('/lottery/api/users').form({
+      name: 'Issac Cabral',
+      cpf: '000.000.000-00',
+      email: 'issac@email.com',
+      password: 'secret'
+    })
+
+    response.assertStatus(200)
+    assert.containsSubset(response.body(), {
+      createdUser: {
+        name: 'Issac Cabral',
+        cpf: '000.000.000-00',
+        email: 'issac@email.com'
+      }
+    })
+
   })
 
 })
