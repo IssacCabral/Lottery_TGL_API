@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 
-import { RolePlayerFactory, UserFactory, CartFactory, GameFactory, QuinaFactory, LotoFacilFactory } from 'Database/factories'
+import { RolePlayerFactory, UserFactory, CartFactory, GameFactory, QuinaFactory, LotoFacilFactory, MegaSenaFactory } from 'Database/factories'
 
 test.group('Bets store', (group) => {
+  group.tap((test) => test.tags(['@bets_store']))
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
-
     return (() => Database.rollbackGlobalTransaction())
   })
 
@@ -156,15 +156,78 @@ test.group('Bets store', (group) => {
     ])
   })
 
-  // test('ensure that an array of numbers is being passed in the request', async ({client}) => {
-
-  // })
-
-  test('ensure the bets can be created when everything is fine', async ({client}) => {
+  test('ensure that an array of numbers is being passed in the request', async ({client}) => {
     const user = await UserFactory.query().create()
     const rolePlayer = await RolePlayerFactory.query().create()
 
     await user.related('roles').attach([rolePlayer.id])
+
+    const game = await GameFactory.query().create()
+
+    const response = await client.post('/lottery/api/bets').loginAs(user).form({
+      bets: [
+        {
+          gameId: game.id
+        },
+      ]
+    })
+
+    response.assertStatus(422)
+    response.assertBodyContains({
+      errors: [
+        {
+          rule: 'required',
+          field: 'bets.0.numbers',
+          message: 'bets.0.numbers field is required'
+        }
+      ]
+    })
+  })
+
+  test('ensure the bets can be created when everything is fine', async ({client, assert}) => {
+    const cart = await CartFactory.query().create()
+
+    const user = await UserFactory.query().create()
+    const rolePlayer = await RolePlayerFactory.query().create()
+
+    await user.related('roles').attach([rolePlayer.id])
+
+    const lotoFacil = await LotoFacilFactory.query().create()
+    const megaSena = await MegaSenaFactory.query().create()
+    const quina = await QuinaFactory.query().create()
+
+    cart.minCartValue = 9.00
+    await cart.save()
+
+    const response = await client.post('/lottery/api/bets').loginAs(user).form({
+      bets: [
+        {
+          "gameId": lotoFacil.id,
+          "numbers": [
+            "01", "02", "03", "04", "05", "10", "13",
+            "14", "17", "20", "21", "18", "7", "9", "12"
+          ]
+        },
+        {
+          "gameId": megaSena.id,
+          "numbers": [
+            "01", "02", "09", "10", "17", "18"
+          ]
+        },
+        {
+          "gameId": quina.id,
+          "numbers": [
+            "01", "02", "03", "10", "17"
+          ]
+        }
+      ]
+    })
+
+    response.assertStatus(201)
+    assert.containsSubset(response.body().user, {
+      "lastBets": [
+      ]
+    })
 
   })
 

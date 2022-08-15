@@ -77,7 +77,6 @@ export default class BetsController {
       return response.badRequest({ message: 'error in set lastBet date', originalError: error.message })
     }
 
-
     try {
       const user = await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
 
@@ -95,7 +94,6 @@ export default class BetsController {
           betQuery.where('created_at', `${year}-${month}-${day}-${hour}-${minute}-${second}`)
         }).firstOrFail()
       
-      
       let userFindedJSON = userFinded.serialize()
 
       delete userFindedJSON.bets
@@ -105,7 +103,7 @@ export default class BetsController {
         return bet.serialize()
       })
 
-      return response.ok({user: userFindedJSON})
+      return response.created({user: userFindedJSON})
     } catch (error) {
       return response.notFound({ message: 'user not found', originalError: error.message })
     }
