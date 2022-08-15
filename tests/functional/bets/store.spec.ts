@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 
 import { RolePlayerFactory, UserFactory, CartFactory, GameFactory, QuinaFactory, LotoFacilFactory, MegaSenaFactory } from 'Database/factories'
+import randomBet from '../../utils/random-bet'
 
 test.group('Bets store', (group) => {
   group.tap((test) => test.tags(['@bets_store']))
@@ -224,11 +225,47 @@ test.group('Bets store', (group) => {
     })
 
     response.assertStatus(201)
-    assert.containsSubset(response.body().user, {
-      "lastBets": [
+    assert.containsSubset(response.body().user, { "lastBets": [] })
+
+  })
+
+  test('ensure create new random bets', async ({client, assert}) => {
+    const cart = await CartFactory.query().create()
+
+    const user = await UserFactory.query().create()
+    const rolePlayer = await RolePlayerFactory.query().create()
+
+    await user.related('roles').attach([rolePlayer.id])
+
+    const lotoFacil = await LotoFacilFactory.query().create()
+    const megaSena = await MegaSenaFactory.query().create()
+    const quina = await QuinaFactory.query().create()
+
+    cart.minCartValue = 9.00
+    await cart.save()
+
+    const response = await client.post('/lottery/api/bets').loginAs(user).form({
+      bets: [
+        {
+          "gameId": lotoFacil.id,
+          "numbers": randomBet(15, 25)
+        },
+        {
+          "gameId": megaSena.id,
+          "numbers": randomBet(6, 60)
+        },
+        {
+          "gameId": quina.id,
+          "numbers": randomBet(5, 80)
+        }
       ]
     })
 
-  })
+    response.assertStatus(201)
+    assert.containsSubset(response.body().user, {
+      "lastBetsPrice": 9, 
+      "lastBets": [] 
+    })
+  })  
 
 })
