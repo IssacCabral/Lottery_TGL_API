@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 
-import { RolePlayerFactory, UserFactory } from 'Database/factories'
+import { RolePlayerFactory, UserFactory, CartFactory, GameFactory, QuinaFactory, LotoFacilFactory } from 'Database/factories'
 
 test.group('Bets store', (group) => {
   group.each.setup(async () => {
@@ -84,7 +84,35 @@ test.group('Bets store', (group) => {
   })
 
   test('make sure cart sum is valid to minCartValue', async ({client}) => {
-    
+    const cart = await CartFactory.query().create()
+
+    const user = await UserFactory.query().create()
+    const rolePlayer = await RolePlayerFactory.query().create()
+
+    await user.related('roles').attach([rolePlayer.id])
+
+    const lotofacil = await LotoFacilFactory.query().create()
+
+    cart.minCartValue = 9.70
+    await cart.save()
+
+    const response = await client.post('/lottery/api/bets').loginAs(user).form({
+      bets: [
+        {
+          gameId: lotofacil.id,
+          numbers: [
+            "01", "02", "03", "04", "05", "10", "13",
+				    "14", "17", "20", "21", "18", "7", "9", "12"
+          ]
+        }
+      ]
+    })
+
+    response.assertStatus(400)
+    response.assertBodyContains([{
+      "message": "your cart must have a minimum value of R$9,70"
+    }])
+
   })
 
   test('ensure the bets can be created when everything is fine', async ({client}) => {
