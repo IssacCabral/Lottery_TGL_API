@@ -92,6 +92,7 @@ test.group('Bets store', (group) => {
     await user.related('roles').attach([rolePlayer.id])
 
     const lotofacil = await LotoFacilFactory.query().create()
+    const quina = await QuinaFactory.query().create()
 
     cart.minCartValue = 9.70
     await cart.save()
@@ -104,16 +105,60 @@ test.group('Bets store', (group) => {
             "01", "02", "03", "04", "05", "10", "13",
 				    "14", "17", "20", "21", "18", "7", "9", "12"
           ]
-        }
+        },
+        {
+          gameId: quina.id,
+          numbers: [
+            "01", "02", "03", "04", "05"
+          ]
+        },
       ]
     })
 
     response.assertStatus(400)
-    response.assertBodyContains([{
-      "message": "your cart must have a minimum value of R$9,70"
-    }])
+    response.assertBodyContains([
+      {
+        "message": "your cart must have a minimum value of R$9,70"
+      }
+    ])
 
   })
+
+  test('make sure you pass the correct amount of numbers for a given game', async ({client}) => {
+    const cart = await CartFactory.query().create()
+
+    const user = await UserFactory.query().create()
+    const rolePlayer = await RolePlayerFactory.query().create()
+
+    await user.related('roles').attach([rolePlayer.id])
+
+    const quina = await QuinaFactory.query().create()
+
+    cart.minCartValue = 9.70
+    await cart.save()
+
+    const response = await client.post('/lottery/api/bets').loginAs(user).form({
+      bets: [
+        {
+          gameId: quina.id,
+          numbers: [
+            "01", "02", "03", "04"
+          ]
+        },
+      ]
+    })
+
+    response.assertStatus(400)
+    response.assertBodyContains([
+      {
+        "message": "The Quina only allows 5 numbers choosen"
+      }
+    ])
+  })
+
+  // test('ensure that an array of numbers is being passed in the request', async ({client}) => {
+
+  // })
 
   test('ensure the bets can be created when everything is fine', async ({client}) => {
     const user = await UserFactory.query().create()
