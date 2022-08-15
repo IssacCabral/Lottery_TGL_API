@@ -4,6 +4,7 @@ import Game from 'App/Models/Game'
 import Cart from 'App/Models/Cart'
 import User from 'App/Models/User'
 import Role from 'App/Models/Role'
+import Bet from 'App/Models/Bet'
 
 export const GameFactory = Factory.define(Game, ({faker}) => {
     return {
@@ -46,3 +47,9 @@ export const RolePlayerFactory = Factory.define(Role, () => {
         description: 'Access to bets and CRUD yourself'
     }
 }).build()
+
+export const BetFactory = Factory.define(Bet, () => {
+    return {
+        
+    }
+})
