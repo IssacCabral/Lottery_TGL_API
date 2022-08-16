@@ -12,9 +12,9 @@ test.group('Admin find all users', (group) => {
     return (() => Database.rollbackGlobalTransaction())
   })
 
-  test('admin must be logged in before index users', async ({client}) => {
+  test('admin must be logged in before index users', async ({ client }) => {
     const response = await client.get('/lottery/api/users')
-    
+
     response.assertStatus(401)
     response.assertBodyContains({
       errors: [
@@ -48,6 +48,21 @@ test.group('Admin find all users', (group) => {
 
     response.assertStatus(200)
     response.assertBodyContains({ users: { meta: { total: 11, per_page: 4, current_page: 1 } } })
-})
+  })
+
+  test('get a no paginated list of existing users', async ({ client }) => {
+    const userAdmin = await UserFactory.query().create()
+    const roleAdmin = await RoleAdminFactory.query().create()
+    await userAdmin.related('roles').attach([roleAdmin.id])
+
+    await UserFactory.query().createMany(10)
+
+    const response = await client.get('/lottery/api/users').loginAs(userAdmin).qs({ noPaginate: true })
+
+    const usersCreated = await User.query().orderBy('id', 'desc').limit(11)
+
+    response.assertStatus(200)
+    response.assertBodyContains(usersCreated.map((row) => row.toJSON()))
+  })
 
 })

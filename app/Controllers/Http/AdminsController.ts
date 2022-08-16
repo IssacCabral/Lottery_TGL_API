@@ -52,7 +52,7 @@ export default class AdminsController {
     const { page, per_page, noPaginate, ...inputs } = request.qs()
 
     if (noPaginate) {
-      return await User.query().filter(inputs).preload('roles')
+      return await User.query().filter(inputs).preload('roles').orderBy('id', 'desc')
     }
 
     try {
