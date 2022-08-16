@@ -6,6 +6,8 @@ import User from 'App/Models/User'
 import Role from 'App/Models/Role'
 import Bet from 'App/Models/Bet'
 
+import generateCpf from '../../tests/utils/random-cpf'
+
 export const GameFactory = Factory.define(Game, ({ faker }) => {
     return {
         type: faker.random.words(2),
@@ -57,7 +59,7 @@ export const CartFactory = Factory.define(Cart, ({ faker }) => {
 export const UserFactory = Factory.define(User, ({ faker }) => {
     return {
         name: faker.name.firstName() + ' ' + faker.name.lastName(),
-        cpf: "000.000.000-00",
+        cpf: generateCpf(),
         email: faker.internet.email(),
         password: faker.internet.password()
     }

@@ -49,7 +49,7 @@ export default class AdminsController {
   }
 
   public async findAllUsers({ request, response }: HttpContextContract) {
-    const { page, limit, noPaginate, ...inputs } = request.qs()
+    const { page, per_page, noPaginate, ...inputs } = request.qs()
 
     if (noPaginate) {
       return await User.query().filter(inputs).preload('roles')
@@ -58,7 +58,8 @@ export default class AdminsController {
     try {
       const users = await User.query()
         .filter(inputs)
-        .paginate(page || 1, limit || 10)
+        .orderBy('id', 'desc')
+        .paginate(page || 1, per_page || 4)
 
       return response.ok({ users })
     } catch (error) {
