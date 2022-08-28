@@ -50,6 +50,22 @@ Route.group(() => {
   .middleware(['auth', 'is:player'])
 
 
-Route.get('/', async ({ response }: HttpContextContract) => {
+//import Producer from '../kafka/Producer'
+
+import producer from '../kafka/Producer'
+
+Route.get('/hello-world', async ({ response }: HttpContextContract) => {
+  //const producer = new Producer()
+
+  await producer.connect()
+
+  await producer.send({topic: 'hello-world', messages: [{value: JSON.stringify({name: 'clidenor'})}]})
+
+  await producer.disconnect()
+
+  // await producer.sendMessage([{value: JSON.stringify('Hello My friend')}], 'hello-world')
+
+  // await producer.disconnect()
+
   return response.ok({ hello: 'world' })
 })
