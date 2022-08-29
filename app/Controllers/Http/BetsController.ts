@@ -12,6 +12,8 @@ import { sendNewBetEmail } from 'App/services/sendEmail'
 import { DateTime } from 'luxon'
 import GetGamesInformation from 'App/utils/GetGamesInformation'
 
+import Producer from '../../../kafka/Producer'
+
 export default class BetsController {
 
   public async index({ request, response, auth }: HttpContextContract) {
@@ -80,7 +82,20 @@ export default class BetsController {
     try {
       const user = await User.query().where('id', auth.user!.id).preload('bets').firstOrFail()
 
-      await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue, gamesInformation)
+      const producer = new Producer()
+
+      await producer.connect()
+
+      await producer.sendMessage([
+        { 
+          value: JSON.stringify({name: user.name, email: user.email, cartTotalValue, gamesInformation})
+        }
+      ], 'new-bets-email')
+
+      await producer.disconnect()
+
+
+      //await sendNewBetEmail(user, 'mail/new_bet', cartTotalValue, gamesInformation)
     } catch (error) {
       return response.status(500).send({ message: 'error in send welcome email', originalError: error.message })
     }

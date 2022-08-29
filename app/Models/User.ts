@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, beforeSave, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeCreate, beforeSave, column, HasMany, hasMany, ManyToMany, manyToMany, afterCreate } from '@ioc:Adonis/Lucid/Orm'
 
 import Hash from '@ioc:Adonis/Core/Hash'
 import Role from './Role'
@@ -10,6 +10,8 @@ import {compose} from '@ioc:Adonis/Core/Helpers'
 import UserFilter from './Filters/UserFilter'
 
 import Bet from './Bet'
+
+import Producer from '../../kafka/Producer'
 
 export default class User extends compose(BaseModel, Filterable) {
   public static $filter = () => UserFilter
@@ -52,6 +54,22 @@ export default class User extends compose(BaseModel, Filterable) {
   @beforeCreate()
   public static assignUUID(user: User){
     user.secureId = uuidv4()
+  }
+
+  @afterCreate()
+  public static async sendWelcomeMail(user: User) {
+    const producer = new Producer()
+
+      await producer.connect()
+
+      await producer.sendMessage([{ 
+        value: JSON.stringify({
+          name: user.name,
+          email: user.email
+        })
+      }], 'welcome-email')
+
+      await producer.disconnect()
   }
 
   @beforeSave()

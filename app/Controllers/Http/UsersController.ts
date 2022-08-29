@@ -13,6 +13,7 @@ import moment from 'moment'
 import { DateTime } from 'luxon'
 import Game from 'App/Models/Game'
 
+import Producer from '../../../kafka/Producer'
 
 export default class UsersController {
 
@@ -40,12 +41,6 @@ export default class UsersController {
     } catch (error) {
       trx.rollback()
       return response.badRequest({ message: 'error in create user', originalError: error.message })
-    }
-
-    try {
-      await sendNewUserEmail(user, 'mail/welcome')
-    } catch (error) {
-      return response.badRequest({ message: 'error in send welcome email', originalError: error.message })
     }
 
     await trx.commit()

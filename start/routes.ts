@@ -61,9 +61,5 @@ Route.get('/hello-world', async ({ response }: HttpContextContract) => {
 
   await producer.disconnect()
 
-  // await producer.sendMessage([{value: JSON.stringify('Hello My friend')}], 'hello-world')
-
-  // await producer.disconnect()
-
   return response.ok({ hello: 'world' })
 })
