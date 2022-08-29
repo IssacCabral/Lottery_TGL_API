@@ -12,6 +12,8 @@ import moment from 'moment'
 
 import {ValidationException} from '@ioc:Adonis/Core/Validator'
 
+import Producer from '../../../kafka/Producer'
+
 export default class ForgotPasswordsController {
     public async store({ request, response }: HttpContextContract) {
         const { email } = await request.validate(ResetPasswordValidator)
@@ -25,7 +27,19 @@ export default class ForgotPasswordsController {
         await user.save()
         
         try {
-            await sendRememberTokenEmail(user, 'mail/forgot-password')
+            const producer = new Producer()
+
+            await producer.connect()
+        
+            await producer.sendMessage([{
+              value: JSON.stringify({
+                name: user.name,
+                email: user.email,
+                rememberMeToken: user.rememberMeToken
+              })
+            }], 'remember-token-email')
+        
+            await producer.disconnect()
         } catch (error) {
             return response.badRequest({ message: 'error in send recovery email', originalError: error.message })
         }

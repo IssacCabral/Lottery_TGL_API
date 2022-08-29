@@ -11,7 +11,7 @@ import User from 'App/Models/User'
 import { DateTime } from 'luxon'
 import moment from 'moment'
 
-import { sendRememberToBetEmail } from '../services/sendEmail'
+import Producer from '../../kafka/Producer'
 
 export default class RememberUserToBet extends BaseTask {
 	public static get schedule() {
@@ -47,8 +47,18 @@ export default class RememberUserToBet extends BaseTask {
 
 					if (isTimeToSendTheEmail) {
 						try {
-							await sendRememberToBetEmail(user, 'mail/remember-bet')
-							return Logger.info('Email sent')
+							const producer = new Producer()
+
+							await producer.connect()
+
+							await producer.sendMessage([{
+								value: JSON.stringify({
+									name: user.name,
+									email: user.email
+								})
+							}], 'remember-to-bet-email')
+
+							await producer.disconnect()
 						} catch (error) {
 							return Logger.error('Error in send email')
 						}
@@ -56,8 +66,18 @@ export default class RememberUserToBet extends BaseTask {
 
 				} else {
 					try {
-						await sendRememberToBetEmail(user, 'mail/remember-bet')
-						return Logger.info('Email sent')
+						const producer = new Producer()
+
+						await producer.connect()
+
+						await producer.sendMessage([{
+							value: JSON.stringify({
+								name: user.name,
+								email: user.email
+							})
+						}], 'remember-to-bet-email')
+
+						await producer.disconnect()
 					} catch (error) {
 						return Logger.error('Error in send email')
 					}
